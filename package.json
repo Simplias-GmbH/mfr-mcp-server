@@ -1,0 +1,13 @@
+{
+  "name": "mfr-mcp",
+  "version": "1.0.0",
+  "description": "MCP Server für die mfr® (Mobile Field Report) API",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  }
+}
