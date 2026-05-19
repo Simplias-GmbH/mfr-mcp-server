@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Connect to mfr®</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; height: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: #ffffff;
+      color: #0f172a;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 16px;
+      padding: 36px 32px 28px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+    }
+    .header { text-align: center; margin-bottom: 24px; }
+    .logo {
+      display: inline-block;
+      width: 56px; height: 56px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+      font-weight: 700;
+      font-size: 24px;
+      line-height: 56px;
+      letter-spacing: -0.5px;
+    }
+    h1 {
+      font-size: 22px;
+      font-weight: 600;
+      margin: 16px 0 6px;
+    }
+    .subtitle {
+      font-size: 14px;
+      color: #64748b;
+      margin: 0;
+    }
+    .client-info {
+      font-size: 13px;
+      color: #475569;
+      background: #f1f5f9;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin: 20px 0;
+      text-align: center;
+    }
+    .client-info strong { color: #0f172a; }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin: 16px 0 6px;
+      color: #334155;
+    }
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 11px 14px;
+      font-size: 15px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #0f172a;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    input[type="text"]:focus, input[type="password"]:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+    button {
+      width: 100%;
+      margin-top: 24px;
+      padding: 12px 16px;
+      font-size: 15px;
+      font-weight: 600;
+      border: 0;
+      border-radius: 8px;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    button:hover { background: #1d4ed8; }
+    button:active { background: #1e40af; }
+    .error {
+      background: #fef2f2;
+      color: #991b1b;
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin: 0 0 16px;
+      border: 1px solid #fecaca;
+    }
+    .footer {
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid #e2e8f0;
+      font-size: 12px;
+      color: #64748b;
+      line-height: 1.5;
+      text-align: center;
+    }
+    .footer strong { color: #334155; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <div class="logo">mfr</div>
+      <h1>Connect to mfr®</h1>
+      <p class="subtitle">Sign in with your Mobile Field Report account</p>
+    </div>
+
+    <div class="client-info">
+      <strong>{{client_name}}</strong> is requesting access to your mfr® account
+    </div>
+
+    {{error}}
+
+    <form method="POST" action="" autocomplete="on">
+      <input type="hidden" name="client_id" value="{{client_id}}">
+      <input type="hidden" name="redirect_uri" value="{{redirect_uri}}">
+      <input type="hidden" name="state" value="{{state}}">
+      <input type="hidden" name="code_challenge" value="{{code_challenge}}">
+      <input type="hidden" name="code_challenge_method" value="{{code_challenge_method}}">
+      <input type="hidden" name="response_type" value="{{response_type}}">
+      <input type="hidden" name="scope" value="{{scope}}">
+      <input type="hidden" name="resource" value="{{resource}}">
+
+      <label for="username">mfr® Username</label>
+      <input type="text" id="username" name="username" required autofocus
+             autocomplete="username" value="{{username}}">
+
+      <label for="password">mfr® Password</label>
+      <input type="password" id="password" name="password" required
+             autocomplete="current-password">
+
+      <button type="submit">Connect</button>
+    </form>
+
+    <div class="footer">
+      <strong>Your credentials are never stored on our servers.</strong><br>
+      They are encrypted into a token that only your AI client holds.
+    </div>
+  </div>
+</body>
+</html>

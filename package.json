@@ -1,13 +1,21 @@
 {
   "name": "mfr-mcp",
-  "version": "1.0.0",
-  "description": "MCP Server für die mfr® (Mobile Field Report) API",
+  "version": "3.0.0",
+  "description": "Remote + local MCP server for the mfr® (Mobile Field Report) API. Stateless OAuth 2.1 with per-customer authentication.",
   "main": "index.js",
   "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "start:stdio": "node index.js",
+    "start:http": "node index.js --http",
+    "dev": "node --watch index.js --http",
+    "generate-key": "node scripts/generate-key.js"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.0"
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "express": "^4.22.2"
   }
 }
