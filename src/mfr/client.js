@@ -72,14 +72,18 @@ export async function mfrFetch(path, credentials, options = {}) {
  * Validate credentials by making a cheap call to mfr®.
  * Used during the OAuth login flow.
  *
- * @returns {Promise<boolean>} true if credentials are valid
+ * @returns {Promise<{valid: boolean, status: number|string}>}
+ *   valid:  true if mfr® accepted the credentials
+ *   status: HTTP status code from mfr® (or descriptive string if not HTTP)
  */
 export async function validateCredentials(credentials) {
   try {
     await mfrFetch('/odata/Users?$top=1', credentials);
-    return true;
+    return { valid: true, status: 200 };
   } catch (err) {
-    if (err.status === 401 || err.status === 403) return false;
+    if (err.status === 401 || err.status === 403) {
+      return { valid: false, status: err.status };
+    }
     throw err;
   }
 }

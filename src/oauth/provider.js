@@ -147,7 +147,21 @@ export const provider = {
     const username = (req.body?.username || '').trim();
     const password = req.body?.password || '';
 
+    // Audit log for every login attempt. NEVER includes the password.
+    const auditBase = {
+      ts: new Date().toISOString(),
+      ip: req.ip
+        || req.headers['x-forwarded-for']
+        || req.socket?.remoteAddress
+        || 'unknown',
+      ua: (req.headers['user-agent'] || '').slice(0, 120),
+      username,
+      usernameLen: username.length,
+      passwordLen: password.length,
+    };
+
     if (!username || !password) {
+      console.log('[login-attempt] empty fields:', auditBase);
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       res.status(400).send(renderLoginForm({
         params, client,
@@ -157,10 +171,11 @@ export const provider = {
       return;
     }
 
-    let valid = false;
+    let result;
     try {
-      valid = await validateCredentials({ username, password });
+      result = await validateCredentials({ username, password });
     } catch (err) {
+      console.log('[login-attempt] mfr unreachable:', { ...auditBase, error: err.message });
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       res.status(502).send(renderLoginForm({
         params, client,
@@ -170,7 +185,13 @@ export const provider = {
       return;
     }
 
-    if (!valid) {
+    console.log('[login-attempt] mfr responded:', {
+      ...auditBase,
+      mfrStatus: result.status,
+      outcome: result.valid ? 'accepted' : 'rejected',
+    });
+
+    if (!result.valid) {
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       res.status(401).send(renderLoginForm({
         params, client,
