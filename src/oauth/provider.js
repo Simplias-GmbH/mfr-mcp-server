@@ -63,9 +63,18 @@ export const clientsStore = {
   async getClient(clientId) {
     try {
       const data = unseal(clientId);
-      if (data.type !== 'client') return undefined;
+      if (data.type !== 'client') {
+        console.warn('[getClient] unseal OK but type wrong:', { type: data.type, len: clientId?.length });
+        return undefined;
+      }
       return data.client;
-    } catch {
+    } catch (err) {
+      console.warn('[getClient] unseal failed:', {
+        len: clientId?.length,
+        head: clientId?.slice(0, 40),
+        tail: clientId?.slice(-40),
+        err: err.message,
+      });
       return undefined;
     }
   },
