@@ -71,11 +71,20 @@ export const clientsStore = {
   },
 
   async registerClient(client) {
+    // Force public-client (PKCE-only) mode regardless of what the registration
+    // request asks for. mcp-remote and most typical MCP clients don't send a
+    // client_secret to /token — they rely on PKCE for security. If we leave the
+    // SDK-generated client_secret in place, those clients fail with
+    // "invalid_client" at the /token endpoint. PKCE is sufficient for our
+    // public-client use case.
     const clientInfo = {
       ...client,
       client_id: 'placeholder',
       client_id_issued_at: now(),
+      token_endpoint_auth_method: 'none',
     };
+    delete clientInfo.client_secret;
+    delete clientInfo.client_secret_expires_at;
     const clientId = seal({ type: 'client', client: clientInfo });
     clientInfo.client_id = clientId;
     return clientInfo;
