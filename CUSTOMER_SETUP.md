@@ -1,82 +1,141 @@
-# Connecting Claude to mfr®
+# Connect Claude to your mfr® account
 
-This is what to send your customers when they want to use mfr® through Claude.
+Use mfr® through Claude in plain language — no learning the API, no clicks.
 
----
-
-## What this gives you
-
-After connecting, you can ask Claude things like:
-
-- *"Show me all open service requests from last week"*
-- *"Create a new appointment for service request 67167551495 on Friday at 10am"*
-- *"What's the budget status of project ACME-2026?"*
+After setup, you can say things like:
+- *"Show me last week's open service requests"*
+- *"Create an appointment for service request 67167551495 on Friday at 10am"*
+- *"What's the project budget status for ACME?"*
 - *"Generate a report for service request 67167551495"*
 
-Claude handles the API calls — you stay in plain language.
-
-## Setup (Claude Desktop)
-
-### 1. Open Claude Desktop settings
-
-`Claude` → `Settings` → `Integrations` → `Add MCP Server`.
-
-### 2. Paste the server URL
-
-```
-https://mcp.simplias.com
-```
-
-Claude will detect that authentication is required and open a browser window.
-
-### 3. Log in with your mfr® account
-
-You'll see a login page asking for your **mfr® username and password** — the same credentials you use at [portal.mobilefieldreport.com](https://portal.mobilefieldreport.com).
-
-Click **Connect**. The browser closes automatically and Claude shows:
-
-> ✓ Connected to mfr®
-
-### 4. Start using it
-
-Open a new conversation and ask Claude about your mfr® data. It will use the connection on demand.
+Claude does the API calls for you using **your own mfr® account**.
 
 ---
 
-## Setup (Cursor, Continue, other MCP clients)
+## Setup (3 steps, ~5 minutes)
 
-Most MCP-aware AI clients support remote MCP servers with OAuth. The flow is the same:
+### 1. Install Claude Desktop
 
-1. Find the "Add MCP server" / "Connect external tool" option.
-2. Paste `https://mcp.simplias.com`.
-3. Complete the OAuth flow in the browser.
+Download from **[claude.ai/download](https://claude.ai/download)** and sign in.
+
+### 2. Add the mfr® server to your config
+
+Open the config file in a text editor:
+
+**Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+*(if installed from Microsoft Store, it's instead at `%LOCALAPPDATA%\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\claude_desktop_config.json`)*
+
+**Mac:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+
+If the file doesn't exist, create it. Paste this content (replace any existing content):
+
+#### Windows config
+
+```json
+{
+  "mcpServers": {
+    "mfr": {
+      "command": "C:\\Program Files\\nodejs\\npx.cmd",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://mfr-mcp.delightfulsky-06abcb55.northeurope.azurecontainerapps.io/mcp"
+      ]
+    }
+  }
+}
+```
+
+#### Mac config
+
+```json
+{
+  "mcpServers": {
+    "mfr": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://mfr-mcp.delightfulsky-06abcb55.northeurope.azurecontainerapps.io/mcp"
+      ]
+    }
+  }
+}
+```
+
+> Requires **Node.js 20+** installed on your machine ([download Node.js](https://nodejs.org/)). `npx` ships with Node.js.
+
+Save the file.
+
+### 3. Restart Claude Desktop and log in
+
+1. **Fully quit** Claude Desktop (system tray → right-click Claude icon → **Quit**)
+2. **Reopen** Claude Desktop
+3. After ~10 seconds your browser opens automatically to the mfr® login page
+4. Enter your **mfr® username and password** (the same ones you use at [portal.mobilefieldreport.com](https://portal.mobilefieldreport.com))
+5. Click **Connect**
+6. Browser shows "You can close this window"
+
+Done. ✅
 
 ---
 
-## Privacy & security
+## Try it
 
-**Your mfr® credentials are never stored on our servers.**
+Open a new conversation in Claude and try:
 
-- When you log in, your password is **validated** by making one test call to mfr®.
-- It's then **AES-256-GCM encrypted** into a token that's held **only by your Claude client**.
-- Every time Claude uses an mfr® tool, our server briefly decrypts the token in memory, calls mfr®, and discards the credentials.
-- We have **no database** of customers or credentials.
+> Use mfr to show me 3 of my customers
 
-If you want to disconnect, remove the server in your AI client's MCP settings — your token is destroyed locally. No further action needed on our side.
+> What service requests are open right now?
 
-## Permissions
+> Create an appointment tomorrow at 14:00 for service request 67167551495
 
-The MCP server can do anything **your mfr® account** can do — no more, no less. If you have read-only access in mfr®, the AI assistant inherits that. To give someone limited access via AI, create a limited mfr® user for them and use those credentials.
+Claude will ask permission the first time it uses each tool — click **Allow always** to skip future prompts.
+
+---
+
+## How authentication works
+
+We use **OAuth 2.1** — the same standard Google, Microsoft, and other large platforms use.
+
+**At login:** Your browser opens a login page hosted by us. You enter your mfr® username and password (the ones you use at portal.mobilefieldreport.com). We validate them against mfr® once, then encrypt them with AES-256-GCM into a token that's stored **only on your computer** by Claude Desktop.
+
+**On every use:** When Claude needs to call mfr®, it sends the encrypted token to our server. We decrypt it in memory, make the API call on your behalf, and immediately discard your credentials. Nothing is logged or stored.
+
+**What we store:** one server-side encryption key. No customer database, no credentials, no logs of your data.
+
+**What you store:** the encrypted token, in Claude Desktop's local OS keychain. Uninstall Claude or remove the connector → the token is gone.
+
+**Permissions:** the AI inherits exactly your mfr® account's permissions — no more, no less.
+
+**Region:** the server is hosted in Microsoft Azure Germany (Frankfurt). Your data doesn't leave the EU.
+
+---
 
 ## Troubleshooting
 
-| Problem | Solution |
+| Problem | Fix |
 |---|---|
-| Login page says "incorrect username or password" | Same as the portal — double-check you can sign in at portal.mobilefieldreport.com first. |
-| Claude says "✓ Connected" but tools fail with 401 | Your token may have expired (24h lifetime). In Claude, remove the integration and add it again. |
-| Claude can't find the tools | Restart Claude Desktop after connecting. |
-| Some tools return 403 | Your mfr® account doesn't have permission for that operation. Ask your mfr® administrator. |
+| Browser never opens for login | Look at Claude Desktop → Settings → Developer → click **View Logs** next to `mfr`. The OAuth URL is in there — copy it into a browser manually. |
+| Login form says "Incorrect username or password" | Use the **same** credentials that work at [portal.mobilefieldreport.com](https://portal.mobilefieldreport.com). If portal login works but ours doesn't, your account may need API access enabled — contact your mfr® administrator. |
+| Claude says "I don't have access to mfr® tools" | Fully quit and restart Claude Desktop. Tools are loaded at startup. |
+| Yellow toast: "Could not attach to MCP server mfr" | Fully quit Claude Desktop and any lingering Node processes (`taskkill /f /im node.exe` on Windows). Then reopen Claude. |
+| Tools work intermittently | Your token expires after 24 hours of inactivity. Re-login when prompted (browser opens automatically). |
+
+---
+
+## Other AI clients
+
+Any MCP client that supports OAuth 2.1 Streamable HTTP works. Examples:
+
+- **Cursor** — `Settings → MCP → Add server` → paste the URL
+- **n8n** — use the MCP node with the URL
+- **Custom MCP clients** — same URL, OAuth 2.1 flow
+
+Server URL: `https://mfr-mcp.delightfulsky-06abcb55.northeurope.azurecontainerapps.io/mcp`
+
+---
 
 ## Support
 
-Email: aymen.chayeb@simplias.com
+Email: **aymen.chayeb@simplias.com**
