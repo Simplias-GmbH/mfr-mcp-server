@@ -80,7 +80,10 @@ export function buildApp() {
   const app = express();
 
   app.disable('x-powered-by');
-  app.set('trust proxy', true);
+  // Trust exactly one proxy hop — Azure Container Apps' envoy ingress.
+  // Setting this to `true` would let any client spoof X-Forwarded-For and
+  // bypass IP-based rate limiting on /authorize.
+  app.set('trust proxy', 1);
 
   app.get('/healthz', (_req, res) => {
     res.json({ ok: true, service: 'mfr-mcp', version: '3.0.0' });
