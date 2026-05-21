@@ -4,8 +4,8 @@ name: Trigger auto deployment for mfr-mcp
 on:
   # Automatically trigger it when detected changes in repo
   push:
-    branches: 
-      [ mcp-remote-server ]
+    branches:
+      [ main ]
     paths:
     - '**'
     - '.github/workflows/mfr-mcp-AutoDeployTrigger-9dd229d2-289a-4d75-a7dc-edd0f5c17012.yml'
